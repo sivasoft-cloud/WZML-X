@@ -197,10 +197,8 @@ async def split_file(path, size, file_, dirpath, split_size, listener, start_tim
                 return False
             elif code != 0:
                 err = (await listener.suproc.stderr.read()).decode().strip()
-                try:
+                with suppress(Exception):
                     await aioremove(out_path)
-                except Exception:
-                    pass
                 if multi_streams:
                     LOGGER.warning(
                         f"{err}. Retrying without map, -map 0 not working in all situations. Path: {path}")

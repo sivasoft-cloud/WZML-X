@@ -268,7 +268,7 @@ async def update_user_settings(query, key=None, edit_type=None, edit_mode=None, 
 
 
 async def user_settings(client, message):
-    if len(message.command) > 1 and (message.command[1] == '-s' or message.command[1] == '-set'):
+    if len(message.command) > 1 and message.command[1] in ['-s', '-set']:
         set_arg = message.command[2].strip() if len(message.command) > 2 else None
         msg = await sendMessage(message, '<i>Fetching Settings...</i>', photo='IMAGES')
         if set_arg and (reply_to := message.reply_to_message):

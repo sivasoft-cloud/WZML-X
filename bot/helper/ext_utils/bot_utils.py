@@ -130,10 +130,10 @@ async def get_telegraph_list(telegraph_content):
 
 def handleIndex(index, dic):
     while True:
-        if abs(index) >= len(dic):
-            if index < 0: index = len(dic) - abs(index)
-            elif index > 0: index = index - len(dic)
-        else: break
+        if abs(index) < len(dic):
+            break
+        if index < 0: index = len(dic) - abs(index)
+        elif index > 0: index = index - len(dic)
     return index
 
 def get_progress_bar_string(pct):
@@ -421,10 +421,7 @@ def update_user_ldata(id_, key=None, value=None):
     exception_keys = ['is_sudo', 'is_auth', 'dly_tasks', 'is_blacklist', 'token', 'time']
     if key is None and value is None:
         if id_ in user_data:
-            updated_data = {}
-            for k, v in user_data[id_].items():
-                if k in exception_keys:
-                    updated_data[k] = v
+            updated_data = {k: v for k, v in user_data[id_].items() if k in exception_keys}
             user_data[id_] = updated_data
         return
     user_data.setdefault(id_, {})
