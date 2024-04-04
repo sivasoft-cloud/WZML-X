@@ -98,9 +98,7 @@ class TgUploader:
             LOGGER.error(f"MediaInfo Error: {e}")
         if config_dict['SAVE_MSG'] and (config_dict['LEECH_LOG_ID'] or not self.__listener.isPrivate):
             buttons.ibutton(BotTheme('SAVE_MSG'), 'save', 'footer')
-        if self.__has_buttons:
-            return buttons.build_menu(1)
-        return None
+        return buttons.build_menu(1) if self.__has_buttons else None
 
     async def __copy_file(self):
         try:
@@ -312,7 +310,7 @@ class TgUploader:
                         continue
                     if self.__is_cancelled:
                         return
-                    self.__prm_media = True if f_size > 2097152000 else False
+                    self.__prm_media = f_size > 2097152000
                     cap_mono, file_ = await self.__prepare_file(file_, dirpath)
                     if self.__last_msg_in_group:
                         group_lists = [x for v in self.__media_dict.values()
@@ -344,7 +342,7 @@ class TgUploader:
                     continue
                 finally:
                     if not self.__is_cancelled and await aiopath.exists(self.__up_path) and \
-                        (not self.__listener.seed or self.__listener.newDir or
+                            (not self.__listener.seed or self.__listener.newDir or
                          dirpath.endswith("/splited_files_mltb") or '/copied_mltb/' in self.__up_path):
                         await aioremove(self.__up_path)
         for key, value in list(self.__media_dict.items()):

@@ -104,8 +104,10 @@ class Streamtape:
         tg_html += "</ol>"
         if nested:
             return tg_html
-        tg_html =  f"""<figure><img src='{config_dict["COVER_IMAGE"]}'></figure>""" + tg_html
-        path = (await telegraph.create_page(title=f"StreamTape X", content=tg_html))["path"]
+        tg_html = f"""<figure><img src='{config_dict["COVER_IMAGE"]}'></figure>{tg_html}"""
+        path = (
+            await telegraph.create_page(title="StreamTape X", content=tg_html)
+        )["path"]
         return f"https://te.legra.ph/{path}"
 
     async def list_folder(self, folder=None):

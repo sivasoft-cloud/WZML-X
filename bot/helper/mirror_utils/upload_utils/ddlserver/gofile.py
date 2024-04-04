@@ -127,8 +127,8 @@ class Gofile:
     async def __setOptions(self, contentId, option, value):
         if self.token is None:
             raise Exception()
-        
-        if not option in ["public", "password", "description", "expire", "tags"]:
+
+        if option not in ["public", "password", "description", "expire", "tags"]:
             raise Exception(f"Invalid GoFile Option Specified : {option}")
         async with ClientSession() as session:
             async with session.put(url=f"{self.api_url}setOption",

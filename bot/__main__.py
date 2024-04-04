@@ -213,32 +213,39 @@ async def restart_notification():
 
 
 async def log_check():
-    if config_dict['LEECH_LOG_ID']:
-        for chat_id in config_dict['LEECH_LOG_ID'].split():
-            chat_id, *topic_id = chat_id.split(":")
+    if not config_dict['LEECH_LOG_ID']:
+        return
+    for chat_id in config_dict['LEECH_LOG_ID'].split():
+        chat_id, *topic_id = chat_id.split(":")
+        try:
             try:
-                try:
-                    chat = await bot.get_chat(int(chat_id))
-                except Exception:
-                    LOGGER.error(f"Not Connected Chat ID : {chat_id}, Make sure the Bot is Added!")
+                chat = await bot.get_chat(int(chat_id))
+            except Exception:
+                LOGGER.error(f"Not Connected Chat ID : {chat_id}, Make sure the Bot is Added!")
+                continue
+            if chat.type == ChatType.CHANNEL:
+                if not (await chat.get_member(bot.me.id)).privileges.can_post_messages:
+                    LOGGER.error(f"Not Connected Chat ID : {chat_id}, Make the Bot is Admin in Channel to Connect!")
                     continue
-                if chat.type == ChatType.CHANNEL:
-                    if not (await chat.get_member(bot.me.id)).privileges.can_post_messages:
-                        LOGGER.error(f"Not Connected Chat ID : {chat_id}, Make the Bot is Admin in Channel to Connect!")
-                        continue
-                    if user and not (await chat.get_member(user.me.id)).privileges.can_post_messages:
-                        LOGGER.error(f"Not Connected Chat ID : {chat_id}, Make the User is Admin in Channel to Connect!")
-                        continue
-                elif chat.type == ChatType.SUPERGROUP:
-                    if not (await chat.get_member(bot.me.id)).status in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]:
-                        LOGGER.error(f"Not Connected Chat ID : {chat_id}, Make the Bot is Admin in Group to Connect!")
-                        continue
-                    if user and not (await chat.get_member(user.me.id)).status in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]:
-                        LOGGER.error(f"Not Connected Chat ID : {chat_id}, Make the User is Admin in Group to Connect!")
-                        continue
-                LOGGER.info(f"Connected Chat ID : {chat_id}")
-            except Exception as e:
-                LOGGER.error(f"Not Connected Chat ID : {chat_id}, ERROR: {e}")
+                if user and not (await chat.get_member(user.me.id)).privileges.can_post_messages:
+                    LOGGER.error(f"Not Connected Chat ID : {chat_id}, Make the User is Admin in Channel to Connect!")
+                    continue
+            elif chat.type == ChatType.SUPERGROUP:
+                if (await chat.get_member(bot.me.id)).status not in [
+                    ChatMemberStatus.OWNER,
+                    ChatMemberStatus.ADMINISTRATOR,
+                ]:
+                    LOGGER.error(f"Not Connected Chat ID : {chat_id}, Make the Bot is Admin in Group to Connect!")
+                    continue
+                if user and (await chat.get_member(user.me.id)).status not in [
+                    ChatMemberStatus.OWNER,
+                    ChatMemberStatus.ADMINISTRATOR,
+                ]:
+                    LOGGER.error(f"Not Connected Chat ID : {chat_id}, Make the User is Admin in Group to Connect!")
+                    continue
+            LOGGER.info(f"Connected Chat ID : {chat_id}")
+        except Exception as e:
+            LOGGER.error(f"Not Connected Chat ID : {chat_id}, ERROR: {e}")
     
 
 async def main():
